@@ -31,6 +31,7 @@ except Exception as e:
     vocab_file.close()
 print("Done")
 
+
 def word2vec_summarizer(paragraph:str, n_clusters:int=4):
     sentences = nltk.sent_tokenize(paragraph)
     X = []
