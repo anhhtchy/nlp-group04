@@ -83,9 +83,9 @@ class SingleModel(ModelProcessor):
         hidden = self.model(content, self.hidden, self.reduce_option)
         hidden_args = ClusterFeatures(hidden, algorithm, random_state=self.random_state).cluster(ratio)
 
-        if use_first:
-            if hidden_args[0] != 0:
-                hidden_args.insert(0,0)
+        # if use_first:
+        #     if hidden_args[0] != 0:
+        #         hidden_args.insert(0,0)
 
         return [content[j] for j in hidden_args]
 

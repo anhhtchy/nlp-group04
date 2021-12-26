@@ -1,17 +1,11 @@
+import nltk
 from flask import Flask, request
-from flask import json
 from flask.json import jsonify
 from flask.templating import render_template
 from flask_cors import CORS
-import nltk
-from gensim.models import KeyedVectors
-from sklearn.cluster import KMeans
-from sklearn.metrics import pairwise_distances_argmin_min
-import pickle
-from summarizer_score import bert_score_compute, rouge_score_compute
-from pyvi import ViTokenizer
-import numpy as np
+
 from bertsummarizer import Summarizer
+from summarizer_score import bert_score_compute, rouge_score_compute
 from word2vec_summarizer import word2vec_summarizer
 
 app = Flask(__name__)
@@ -24,13 +18,16 @@ print("Initialize Summarizer...")
 model = Summarizer()
 print("Done")
 
+
 @app.route('/')
 def index():
     return render_template('base.html')
 
+
 @app.route('/score', methods=['GET'])
 def score_get():
     return render_template('score.html')
+
 
 @app.route('/score', methods=['POST'])
 def score_post():
@@ -42,52 +39,56 @@ def score_post():
     method = str(request_data["method"])
 
     file = open(plaintext_dir, 'r', encoding='utf8')
-    plaintext = file.read()
+    original = file.read()
     file.close()
+
     file = open(manual_summary_dir, 'r', encoding='utf8')
-    manual_summary = file.read()
+    ref = file.read()
     file.close()
 
-    m_s = process(manual_summary)
-    processed = process(plaintext)
+    original = process(original)
+    ref = process(ref)
 
-    sentences = nltk.sent_tokenize(m_s)
+    ref_sentences = nltk.sent_tokenize(ref)
+    original_sentences = nltk.sent_tokenize(original)
 
-    nsum1 = len(sentences)
-    print(nsum1, end=' ')
+    ref_len = len(ref_sentences)
+    original_len = len(original_sentences)
+
     summary = ""
 
     if modeling == 'bert':
         summary = ''.join(model(
-            body=processed,
-            ratio=float(nsum1),
+            body=original,
+            ratio=float(ref_len),
             min_length=0,
             use_first=False
         ))
         summary = summary.replace('_', ' ')
     if modeling == 'word2vec':
-        summary = word2vec_summarizer(processed, nsum1)
-    # summary = summary.replace('...', '')
+        summary = word2vec_summarizer(original, ref_len)
+
     print(len(summary.strip().split('. ')))
     p, r, f1 = 0, 0, 0
 
-    print(m_s.encode("utf-8"))
+    print(ref.encode("utf-8"))
     print(summary.encode("utf-8"))
 
     if method == 'bert':
-        p, r, f1 = bert_score_compute(summary, manual_summary, lang='vi')
+        p, r, f1 = bert_score_compute(summary, ref, lang='vi')
     if method == 'rouge':
-        p, r, f1 = rouge_score_compute(summary, manual_summary, 'l')
+        p, r, f1 = rouge_score_compute(summary, ref, 'l')
 
     resp = {
         "model-summarized": summary,
-        "manual-summarized": m_s,
-        "paragraph": plaintext,
+        "manual-summarized": ref,
+        "paragraph": original,
         "p": p,
         "r": r,
         "f1": f1
     }
     return jsonify(resp)
+
 
 @app.route('/word2vec', methods=['GET'])
 def word2vec_get():
@@ -98,11 +99,12 @@ def word2vec_get():
 def word2vec_post():
     data = request.json
     body = process(str(data["body"]))
-    # print(body)
+
     n_clusters = int(data["n_clusters"])
 
     summary = word2vec_summarizer(body, n_clusters)
     return jsonify({"summarized": summary})
+
 
 @app.route('/bert', methods=['GET'])
 def bert_get():
@@ -128,6 +130,7 @@ def bert_post():
     }
     return jsonify(resp)
 
+
 def process(para: str):
     processed = ''
     for line in para.splitlines():
@@ -139,6 +142,7 @@ def process(para: str):
                 line = line + ' '
         processed += line
     return processed.strip()
+
 
 if __name__ == "__main__":
     app.run(debug=True, threaded=True)
