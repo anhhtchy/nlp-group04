@@ -8,33 +8,29 @@ from gensim.models import KeyedVectors
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
 import pickle
-# from revolution_score import bert_score_compute, rouge_score_compute
+from summarizer_score import bert_score_compute, rouge_score_compute
 from pyvi import ViTokenizer
 import numpy as np
-# from summarizer import Summarizer
+from bertsummarizer import Summarizer
 from word2vec_summarizer import word2vec_summarizer
 
 app = Flask(__name__)
 CORS(app)
 
-'''
 DATA_DIR = './data/plaintext/'
 MANUAL_DIR = './data/manual_summary/'
 
 print("Initialize Summarizer...")
 model = Summarizer()
 print("Done")
-'''
 
 @app.route('/')
 def index():
     return render_template('base.html')
 
-'''
 @app.route('/score', methods=['GET'])
 def score_get():
     return render_template('score.html')
-
 
 @app.route('/score', methods=['POST'])
 def score_post():
@@ -70,28 +66,8 @@ def score_post():
         ))
         summary = summary.replace('_', ' ')
     if modeling == 'word2vec':
-        sentences = nltk.sent_tokenize(plaintext)
-        X = []
-        for sentence in sentences:
-            sentence = ViTokenizer.tokenize(sentence)
-            words = sentence.split(" ")
-            sentence_vec = np.zeros((300))
-            for word in words:
-                if word in vocab:
-                    sentence_vec += vocab[word]
-                    break
-            X.append(sentence_vec)
-        kmeans = KMeans(n_clusters=nsum1)
-        kmeans.fit(X)
-
-        avg = []
-        for j in range(nsum1):
-            idx = np.where(kmeans.labels_ == j)[0]
-            avg.append(np.mean(idx))
-        closest, _ = pairwise_distances_argmin_min(kmeans.cluster_centers_, X)
-        ordering = sorted(range(nsum1), key=lambda k: avg[k])
-        summary = ' '.join([sentences[closest[idx]] for idx in ordering])
-    summary = summary.replace('...', '')
+        summary = word2vec_summarizer(processed, nsum1)
+    # summary = summary.replace('...', '')
     print(len(summary.strip().split('. ')))
     p, r, f1 = 0, 0, 0
 
@@ -112,15 +88,14 @@ def score_post():
         "f1": f1
     }
     return jsonify(resp)
-'''
 
 @app.route('/word2vec', methods=['GET'])
-def knn_get():
-    return render_template('knn.html')
+def word2vec_get():
+    return render_template('word2vec.html')
 
 
 @app.route('/word2vec', methods=['POST'])
-def knn_post():
+def word2vec_post():
     data = request.json
     body = process(str(data["body"]))
     # print(body)
@@ -129,7 +104,6 @@ def knn_post():
     summary = word2vec_summarizer(body, n_clusters)
     return jsonify({"summarized": summary})
 
-'''
 @app.route('/bert', methods=['GET'])
 def bert_get():
     return render_template('bert.html')
@@ -141,12 +115,7 @@ def bert_post():
     ratio = float(data["ratio"])
     min_length = int(data["min_length"])
     body = str(data["body"])
-    paragraph = "" # paragraph = process(body)
-    for line in body.splitlines():
-        line = line.strip()
-        if line != '' and line[-1:] != '.':
-            line = line + '.'
-        paragraph += line.strip()
+    paragraph = process(body)
 
     result = ''.join(model(
         paragraph,
@@ -158,7 +127,6 @@ def bert_post():
         "summarized": result
     }
     return jsonify(resp)
-'''
 
 def process(para: str):
     processed = ''

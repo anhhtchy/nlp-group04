@@ -1,6 +1,6 @@
-from summarizer.BertParent import BertParent
+from bertsummarizer.BertParent import BertParent
 from typing import List
-from summarizer.ClusterFeatures import ClusterFeatures
+from bertsummarizer.ClusterFeatures import ClusterFeatures
 from abc import abstractmethod
 import neuralcoref
 from spacy.lang.vi import Vietnamese

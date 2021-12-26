@@ -1,4 +1,4 @@
-bert-score==0.1.2
+bert-score==0.3.11
 blis==0.2.4
 boto3==1.17.90
 botocore==1.20.90

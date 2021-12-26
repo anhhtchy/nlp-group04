@@ -1,1 +1,1 @@
-from summarizer.model_processors import Summarizer, SingleModel
+from bertsummarizer.model_processors import Summarizer, SingleModel
