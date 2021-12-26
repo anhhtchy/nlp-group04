@@ -71,8 +71,8 @@ def score_post():
     print(len(summary.strip().split('. ')))
     p, r, f1 = 0, 0, 0
 
-    print(ref.encode("utf-8"))
-    print(summary.encode("utf-8"))
+    print(ref)
+    print(summary)
 
     if method == 'bert':
         p, r, f1 = bert_score_compute(summary, ref, lang='vi')

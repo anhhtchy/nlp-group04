@@ -19,14 +19,14 @@ except LookupError:
 vocab = None
 print("Loading Word2Vec vocab...")
 try:
-    vocab_file = open("word2vec-vocab.pkl", "rb")
+    vocab_file = open("lib/word2vec/word2vec-vocab.pkl", "rb")
     vocab = pickle.load(vocab_file)
     vocab_file.close()
 except Exception as e:
     print(e)
-    w2v = KeyedVectors.load_word2vec_format('we_knn/wiki.vi.vec')
+    w2v = KeyedVectors.load_word2vec_format('lib/word2vec/wiki.vi.vec')
     vocab = w2v.key_to_index
-    vocab_file = open("word2vec-vocab.pkl", "wb")
+    vocab_file = open("lib/word2vec/word2vec-vocab.pkl", "wb")
     pickle.dump(vocab, vocab_file)
     vocab_file.close()
 print("Done")
