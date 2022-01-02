@@ -38,11 +38,11 @@ def score_post():
     modeling = str(request_data["model"])
     method = str(request_data["method"])
 
-    file = open(plaintext_dir, 'r', encoding='utf8')
+    file = open(plaintext_dir, 'r', encoding='utf8', errors='ignore')
     original = file.read()
     file.close()
 
-    file = open(manual_summary_dir, 'r', encoding='utf8')
+    file = open(manual_summary_dir, 'r', encoding='utf8', errors='ignore')
     ref = file.read()
     file.close()
 
@@ -77,7 +77,7 @@ def score_post():
     if method == 'bert':
         p, r, f1 = bert_score_compute(summary, ref, lang='vi')
     if method == 'rouge':
-        p, r, f1 = rouge_score_compute(summary, ref, 'l')
+        p, r, f1 = rouge_score_compute(summary, ref, '2')
 
     resp = {
         "model-summarized": summary,
