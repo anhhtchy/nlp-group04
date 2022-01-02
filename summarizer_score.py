@@ -8,7 +8,7 @@ def bert_score_compute(cands, ref, lang):
     cands = nltk.sent_tokenize(cands)
     ref = nltk.sent_tokenize(ref)
     P, R, F1 = score(cands, ref, lang=lang,
-                     model_type="bert-base-multilingual-cased", verbose=True, rescale_with_baseline=False)
+                     model_type="bert-base-multilingual-cased", verbose=True, rescale_with_baseline=True, idf=True)
     return round(float(P.mean()), 2), float(R.mean()), round(float(F1.mean()), 3)
 
 
@@ -25,6 +25,18 @@ def rouge_score_compute(cands, refs, rouge_type):
     R = scores["rouge-" + rouge_type]['r']
     return round(P, 3), round(R, 3), round(F1, 3)
 
+def rouge_score_compute_all_type(cands, refs):
+    types = ["1", "2", "l"]
+    result = dict()
+    rouge = Rouge()
+    scores = rouge.get_scores(cands, refs)[0] # return rouge-1, rouge-2, rouge-l
+    # print(scores)
+    for rouge_type in types:
+        P = scores["rouge-" + rouge_type]['p']
+        F1 = scores["rouge-" + rouge_type]['f']
+        R = scores["rouge-" + rouge_type]['r']
+        result[rouge_type] = [round(P, 3), round(R, 3), round(F1, 3)]
+    return result
 # if __name__ == '__main__':
 #     cands = "Tôi rất đẹp trai. Tôi đi nhiều nơi trên thế giới"
 #     refs = "Tôi đẹp trai. Và tôi đã đi nhiều nơi trên thế giới"

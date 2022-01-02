@@ -47,11 +47,16 @@ def word2vec_summarizer(paragraph:str, n_clusters:int=4):
     kmeans = KMeans(n_clusters=n_clusters)
     kmeans.fit(X)
 
-    avg = []
-    for j in range(n_clusters):
-        idx = np.where(kmeans.labels_ == j)[0]
-        avg.append(np.mean(idx))
+    # avg = []
+    # for j in range(n_clusters):
+    #     idx = np.where(kmeans.labels_ == j)[0]
+    #     avg.append(np.mean(idx))
+    # closest, _ = pairwise_distances_argmin_min(kmeans.cluster_centers_, X)
+    # ordering = sorted(range(n_clusters), key=lambda k: avg[k])
+    # summary = ' '.join([sentences[closest[idx]] for idx in ordering])
+
     closest, _ = pairwise_distances_argmin_min(kmeans.cluster_centers_, X)
-    ordering = sorted(range(n_clusters), key=lambda k: avg[k])
-    summary = ' '.join([sentences[closest[idx]] for idx in ordering])
+    ordering = sorted(closest)
+    summary = ' '.join([sentences[idx] for idx in ordering])
+
     return ''.join(summary)
