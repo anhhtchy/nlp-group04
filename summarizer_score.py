@@ -9,7 +9,7 @@ def bert_score_compute(cands, ref, lang):
     ref = nltk.sent_tokenize(ref)
     P, R, F1 = score(cands, ref, lang=lang,
                      model_type="bert-base-multilingual-cased", verbose=True, rescale_with_baseline=True, idf=True)
-    return round(float(P.mean()), 2), float(R.mean()), round(float(F1.mean()), 3)
+    return round(float(P.mean()), 3), round(float(R.mean()), 3), round(float(F1.mean()), 3)
 
 
 def plot_similarity_matrix(cand, ref, lang):
