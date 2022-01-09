@@ -77,7 +77,7 @@ def score_post():
     if method == 'bert':
         p, r, f1 = bert_score_compute(summary, ref, lang='vi')
     if method == 'rouge':
-        p, r, f1 = rouge_score_compute(summary, ref, '2')
+        p, r, f1 = rouge_score_compute(summary, ref, '1')
 
     resp = {
         "model-summarized": summary,

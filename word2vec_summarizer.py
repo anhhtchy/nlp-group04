@@ -29,8 +29,18 @@ except Exception as e:
     vocab_file = open("lib/word2vec/word2vec-vocab.pkl", "wb")
     pickle.dump(vocab, vocab_file)
     vocab_file.close()
-print("Done")
 
+try: 
+    w2v_file = open("lib/word2vec/word2vec.pkl", "rb")
+    w2v = pickle.load(w2v_file)
+    w2v_file.close()
+except Exception as e:
+    print(e)
+    w2v = KeyedVectors.load_word2vec_format('lib/word2vec/wiki.vi.vec')
+    w2v_file = open("lib/word2vec/word2vec.pkl", "wb")
+    pickle.dump(w2v, w2v_file)
+    w2v_file.close()
+print("Done")
 
 def word2vec_summarizer(paragraph:str, n_clusters:int=4):
     sentences = nltk.sent_tokenize(paragraph)
@@ -41,8 +51,7 @@ def word2vec_summarizer(paragraph:str, n_clusters:int=4):
         sentence_vec = np.zeros((300))
         for word in words:
             if word in vocab:
-                sentence_vec += vocab[word]
-                break # why break
+                sentence_vec += w2v[word]
         X.append(sentence_vec)
     kmeans = KMeans(n_clusters=n_clusters)
     kmeans.fit(X)
