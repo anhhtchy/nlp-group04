@@ -20,7 +20,7 @@ class ClusterFeatures(object):
             self.features = PCA(n_components=pca_k).fit_transform(features)
         else:
             self.features = features
-
+        # print('ClusterFeatures', self.features.shape)
         self.algorithm = algorithm
         self.pca_k = pca_k
         self.random_state = random_state

@@ -221,7 +221,7 @@ if __name__ == '__main__':
     print(np.mean(rougel_bert, axis=0))
     ''' 
 
-    ''' BERT - Rouge Score + BERT Score '''
+    ''' BERT - Rouge Score + BERT Score 
     scores_bert = evaluate_bert()
     rouge1_bert = np.array(scores_bert["1"])
     rouge2_bert = np.array(scores_bert["2"])
@@ -232,3 +232,4 @@ if __name__ == '__main__':
     print(np.mean(rouge2_bert, axis=0))
     print(np.mean(rougel_bert, axis=0))
     print(np.mean(bert_bert, axis=0))
+    '''
